@@ -5,14 +5,14 @@
 #include <DHT.h>
 
 // Substitua pelas suas credenciais de rede
-const char* ssid = "Isabela_oifibra2.4G";
-const char* password = "992709418";
+const char* ssid = "MARIA_OiFibra2.4GHz";
+const char* password = "Mf121052";
 
-#define DHTPIN 27     // Pino digital conectado ao sensor DHT
+#define DHTPIN 4     // Pino digital conectado ao sensor DHT
 
 //Descomente o tipo de sensor em uso:
-//#define DHTTYPE    DHT11     // DHT 11
-#define DHTTYPE    DHT22     // DHT 22 (AM2302)
+#define DHTTYPE    DHT11     // DHT 11
+//#define DHTTYPE    DHT22     // DHT 22 (AM2302)
 //#define DHTTYPE    DHT21     // DHT 21 (AM2301)
 
 DHT dht(DHTPIN, DHTTYPE);
@@ -32,7 +32,11 @@ String readDHTTemperature() {
     return "--";
   }
   else {
-    Serial.println(t);
+    // Get Temperature
+    Serial.print("temperatura; ");  
+    Serial.print(t); 
+    Serial.println("C°");
+    //Serial.println(t);
     return String(t);
   }
 }
@@ -45,7 +49,11 @@ String readDHTHumidity() {
     return "--";
   }
   else {
-    Serial.println(h);
+    // Get Humidity
+    Serial.print("humidade; ");  
+    Serial.print(h); 
+    Serial.println("%");
+    //Serial.println(h);
     return String(h);
   }
 }
@@ -53,9 +61,12 @@ String readDHTHumidity() {
 const char index_html[] PROGMEM = R"rawliteral(
 <!DOCTYPE HTML><!html>
 <!head>
-  <!meta name="viewport" content="width=device-width, initial-scale=1">
-  <!link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.2/css/all.css" integrity="sha384-fnmOCqbTlWIlj8LyTjo7mOUStjsKC4pOpQbqyi7RrhN7udi9RwhKkMHpvLbHG9Sr" crossorigin="anonymous">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  
+  <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.2/css/all.css" integrity="sha384-fnmOCqbTlWIlj8LyTjo7mOUStjsKC4pOpQbqyi7RrhN7udi9RwhKkMHpvLbHG9Sr" crossorigin="anonymous">
+  
   <!style>
+  <!link rel="stylesh
     html {
      font-family: Arial;
      display: inline-block;
@@ -78,13 +89,13 @@ const char index_html[] PROGMEM = R"rawliteral(
     <i class="fas fa-thermometer-half" style="color:#059e8a;"></i> 
     <span class="dht-labels">Temperatura</span> 
     <span id="temperature">%TEMPERATURE%</span>
-    <sup class="units">°C</sup>
+    <sup class="units"> °C </sup>
   </p>
   <p>
-    <i class="fas fa-tint" style="color:#00add6;"></i> 
+    <i class="fas fa-tint" style="color:#0000FF;"></i> 
     <span class="dht-labels">Umidade</span>
     <span id="humidity">%HUMIDITY%</span>
-    <sup class="units">%</sup>
+    <sup class="units"> % </sup>
   </p>
 </body>
 <script>
@@ -126,13 +137,14 @@ String processor(const String& var){
 
 void setup(){
   // Porta serial para fins de depuração
-  Serial.begin(115200);
+  Serial.begin(9600);
 
   dht.begin();
   
   // Conecte-se ao Wi-Fi
   WiFi.begin(ssid, password);
-  while (WiFi.status() != WL_CONNECTED) {
+  while (WiFi.status() != WL_CONNECTED) 
+  {
     delay(1000);
     Serial.println("Conecção para o WiFi..");
   }
@@ -140,21 +152,42 @@ void setup(){
   // Imprimir endereço IP local do ESP32
   Serial.println(WiFi.localIP());
 
-  // Rota para raiz / página da web
-  server.on("/", HTTP_GET, [](AsyncWebServerRequest *request){
+   // Rota para raiz / página da web
+  server.on("/", HTTP_GET, [](AsyncWebServerRequest *request)
+  {
     request->send_P(200, "text/html", index_html, processor);
   });
-  server.on("/temperature", HTTP_GET, [](AsyncWebServerRequest *request){
+  server.on("/temperature", HTTP_GET, [](AsyncWebServerRequest *request)
+  {
     request->send_P(200, "text/plain", readDHTTemperature().c_str());
   });
-  server.on("/humidity", HTTP_GET, [](AsyncWebServerRequest *request){
+  server.on("/humidity", HTTP_GET, [](AsyncWebServerRequest *request)
+  {
     request->send_P(200, "text/plain", readDHTHumidity().c_str());
   });
 
+  
   // Start server
   server.begin();
 }
  
-void loop(){
-  
+void loop()
+{
+ /*  float temp = 0;
+  float humid = 0; 
+
+  temp = dht.readTemperature();
+  humid = dht.readHumidity();
+
+  // Get Temperature
+  Serial.print("temperatura; ");  
+  Serial.print(temp); 
+  Serial.println("C°");
+
+  // Get Humidity
+  Serial.print("humidade; ");  
+  Serial.print(humid); 
+  Serial.println("%");
+
+  delay(5000); */
 }
